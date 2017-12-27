@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+
+<html lang="en">
+
+<head>
+    <title>Kafka Streams</title>
+
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+
+    <!-- jQuery library -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <!-- Latest compiled JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+</head>
+
+<body>
+
+    <div class="container">
+        <div class="row">
+            <h3>Add new record</h3>
+            <form class="form-inline" action="/newScore" method="post">
+                <div class="form-group">
+                    <label for="user">User :</label>
+                    <input type="text" class="form-control" id="user" name="user">
+                </div>
+                <div class="form-group">
+                    <label for="score">Score :</label>
+                    <input type="text" class="form-control" id="score" name="score">
+                </div>
+                <button type="submit" class="btn btn-default">Submit</button>
+            </form>
+
+        </div>
+        <hr />
+        <div class="row">
+            <div class="col-sm-6">
+                <h3>Top 5</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>User</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblHighScores">
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-sm-6">
+                <h3>Last 10 events</h3>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>User</th>
+                            <th>Score</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tblAllEvents">
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+
+    </div>
+
+</body>
+
+<script type="text/javascript">
+
+    $(document).ready(function () {
+        var source = new EventSource("/events");
+        source.onmessage = function (event) {
+            var data=JSON.parse(event.data);
+            var tbl = document.getElementById("tblAllEvents")
+            tbl.innerHTML = "<tr><td>" + data.time + "</td><td>" + data.user + "</td><td>" + data.score + "</td></tr>" + tbl.innerHTML;
+
+            var size = tbl.childElementCount;
+            if (size > 10) {
+                tbl.removeChild( tbl.childNodes[10] );
+            }
+        };
+    });
+
+    $(document).ready(function () {
+        var source = new EventSource("/highScores");
+        source.onmessage = function (event) {
+
+            var data=JSON.parse(event.data);
+            document.getElementById("tblHighScores").innerHTML = "";
+
+            for(var i = data.length-1; i >= 0; i--) {
+                document.getElementById("tblHighScores").innerHTML += "<tr><td>" + data[i].time + "</td><td>" + data[i].user + "</td><td>" + data[i].score + "</td></tr>";
+            }
+        };
+    });
+
+
+</script>
+
+</html>
