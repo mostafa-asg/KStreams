@@ -25,8 +25,8 @@ public class HighScoreStreams extends Thread {
 
         final StreamsBuilder builder = new StreamsBuilder();
 
-        KStream<String, Integer> scores = builder.stream("scores", Consumed.with(Serdes.String(), Serdes.Integer()));
-        KTable<String, Integer> highScores = builder.table("high-scores", Consumed.with(Serdes.String(), Serdes.Integer(),new FailOnInvalidTimestamp(), Topology.AutoOffsetReset.EARLIEST));
+        KStream<String, Integer> scores = builder.stream(Constants.SCORES_TOPIC_NAME, Consumed.with(Serdes.String(), Serdes.Integer()));
+        KTable<String, Integer> highScores = builder.table(Constants.HIGH_SCORES_TOPIC_NAME, Consumed.with(Serdes.String(), Serdes.Integer(),new FailOnInvalidTimestamp(), Topology.AutoOffsetReset.EARLIEST));
 
         scores.leftJoin( highScores , (v1,v2) -> {
 
@@ -35,7 +35,7 @@ public class HighScoreStreams extends Thread {
                 return v1;
             }
 
-            //record has hit his/hre record
+            //user has hit his/hre record
             if( v1 > v2 ) {
                 return v1;
             }
@@ -49,7 +49,7 @@ public class HighScoreStreams extends Thread {
 
         Topology topology = builder.build();
         Properties props = new Properties();
-        props.setProperty(StreamsConfig.APPLICATION_ID_CONFIG,"high-score-app3");
+        props.setProperty(StreamsConfig.APPLICATION_ID_CONFIG,"high-score-app");
         props.setProperty(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, Constants.KAFKA_BROKER);
         props.setProperty(StreamsConfig.COMMIT_INTERVAL_MS_CONFIG,"10000");
         streams = new KafkaStreams( topology , props );
