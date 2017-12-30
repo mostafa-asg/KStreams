@@ -122,7 +122,7 @@ public class HttpServer {
 
     private Producer<String,Integer> createKafkaProducer(){
         Properties kafkaProps = new Properties();
-        kafkaProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,"localhost:9092"); //TODO
+        kafkaProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG,Constants.KAFKA_BROKER);
         kafkaProps.put(ProducerConfig.ACKS_CONFIG, "-1" );
         kafkaProps.put(ProducerConfig.RETRIES_CONFIG, "3" );
         kafkaProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, "org.apache.kafka.common.serialization.StringSerializer" );
